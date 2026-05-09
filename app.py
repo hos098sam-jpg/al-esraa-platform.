@@ -9,22 +9,22 @@ from datetime import datetime
 app = Flask(__name__, template_folder='.', static_folder='.')
 app.secret_key = "al_esraa_ultimate_v14_2026"
 
-# إعدادات رفع الصور
+# 1. إعدادات المجلدات ورفع الصور
 UPLOAD_FOLDER = 'static/uploads'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# قاعدة البيانات (تأكد من ربط PostgreSQL لاحقاً لثبات البيانات)
+# 2. إعدادات قاعدة البيانات
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///al_esraa_pro.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# --- الجداول ---
+# --- 3. الجداول (Database Models) ---
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     full_name = db.Column(db.String(100))
-    username = db.Column(db.String(50), unique=True) # رقم الهاتف
+    username = db.Column(db.String(50), unique=True)
     parent_phone = db.Column(db.String(50))
     password = db.Column(db.String(50))
     role = db.Column(db.String(10), default='student')
@@ -57,6 +57,11 @@ class Question(db.Model):
     correct_answer = db.Column(db.String(1))
     lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'))
 
+class SubscriptionCode(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(20), unique=True)
+    is_used = db.Column(db.Boolean, default=False)
+
 class ExamResult(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     score = db.Column(db.Integer)
@@ -65,14 +70,14 @@ class ExamResult(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     lesson_title = db.Column(db.String(100))
 
-# إنشاء قاعدة البيانات والإدمن الافتراضي
+# إنشاء الجداول والإدمن
 with app.app_context():
     db.create_all()
     if not User.query.filter_by(username="01063839943").first():
         db.session.add(User(full_name="إسراء فرج", username="01063839943", parent_phone="Admin", password="esraa2026", role="admin"))
         db.session.commit()
 
-# دالة مساعدة لحفظ الصور
+# دالة حفظ الصور
 def save_image(file):
     if file and file.filename != '':
         filename = secure_filename(str(random.randint(1000, 9999)) + "_" + file.filename)
@@ -80,7 +85,7 @@ def save_image(file):
         return f"static/uploads/{filename}"
     return None
 
-# --- المسارات (Routes) ---
+# --- 4. المسارات (Routes) ---
 
 @app.route('/')
 def index():
@@ -95,21 +100,13 @@ def login():
             return redirect(url_for('admin_pro' if u.role == 'admin' else 'student_dashboard'))
     return render_template('login.html')
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        if not User.query.filter_by(username=request.form.get('phone')).first():
-            new_u = User(full_name=request.form.get('name'), username=request.form.get('phone'),
-                         parent_phone=request.form.get('parent_phone'), password=request.form.get('password'))
-            db.session.add(new_u); db.session.commit()
-            return redirect(url_for('login'))
-    return render_template('register.html')
-
 @app.route('/admin_pro')
 def admin_pro():
     if session.get('role') != 'admin': return redirect(url_for('login'))
-    # هنا ربطنا الكود بملف admin_dashboard.html اللي أنت عايزه
-    return render_template('admin_dashboard.html', courses=Course.query.all(), students=User.query.filter_by(role='student').all())
+    return render_template('admin_dashboard.html', 
+                           courses=Course.query.all(), 
+                           students=User.query.filter_by(role='student').all(),
+                           codes=SubscriptionCode.query.all())
 
 @app.route('/add_course', methods=['POST'])
 def add_course():
@@ -127,9 +124,10 @@ def add_lesson_full():
         db.session.add(new_l); db.session.commit()
         
         q_texts = request.form.getlist('q_text[]')
+        q_images = request.files.getlist('q_image[]')
         for i, text in enumerate(q_texts):
             if text:
-                img = save_image(request.files.getlist('q_image[]')[i])
+                img = save_image(q_images[i]) if i < len(q_images) else None
                 q = Question(text=text, image_path=img,
                              option_a=request.form.getlist('q_a[]')[i],
                              option_b=request.form.getlist('q_b[]')[i],
@@ -141,11 +139,15 @@ def add_lesson_full():
         db.session.commit()
     return redirect(url_for('admin_pro'))
 
-@app.route('/student_dashboard')
-def student_dashboard():
-    if not session.get('u_id'): return redirect(url_for('login'))
-    u = User.query.get(session['u_id'])
-    return render_template('student_dashboard.html', user=u, courses=Course.query.all())
+@app.route('/generate_codes', methods=['POST'])
+def generate_codes():
+    if session.get('role') == 'admin':
+        count = int(request.form.get('count', 0))
+        for _ in range(count):
+            random_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+            db.session.add(SubscriptionCode(code=random_code))
+        db.session.commit()
+    return redirect(url_for('admin_pro'))
 
 @app.route('/logout')
 def logout():
