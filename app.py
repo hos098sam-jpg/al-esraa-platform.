@@ -5,13 +5,11 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
-# التعديل السحري: خلينا المجلد الرئيسي هو مجلد القوالب عشان يقرأ الملفات وهي بره
+# إعداد التطبيق ليعمل في المجلد الرئيسي مباشرة لسهولة الرفع
 app = Flask(__name__, template_folder='.', static_folder='.')
-
-# مفتاح الأمان
 app.secret_key = "al_esraa_ultimate_v14_2026"
 
-# إعداد قاعدة البيانات - مسار مباشر وبسيط
+# إعداد قاعدة البيانات
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///al_esraa_pro.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -40,20 +38,15 @@ class Lesson(db.Model):
     pdf_url = db.Column(db.String(500))
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
 
-# إنشاء قاعدة البيانات وتعيين الإدمن (مس إسراء فرج)
+# إنشاء قاعدة البيانات
 with app.app_context():
     db.create_all()
     if not User.query.filter_by(username="01063839943").first():
-        db.session.add(User(
-            full_name="إسراء فرج",
-            username="01063839943",
-            parent_phone="Admin",
-            password="123",
-            role="admin"
-        ))
+        db.session.add(User(full_name="إسراء فرج", username="01063839943", parent_phone="Admin", password="123", role="admin"))
         db.session.commit()
 
-# --- المسارات ---
+# --- المسارات (Routes) ---
+
 @app.route('/')
 def index():
     return render_template('index.html', courses=Course.query.all())
@@ -67,23 +60,31 @@ def login():
             return redirect(url_for('admin_pro' if u.role == 'admin' else 'student_dashboard'))
     return render_template('login.html')
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        phone = request.form.get('phone')
-        if not User.query.filter_by(username=phone).first():
-            new_u = User(full_name=request.form.get('full_name'), username=phone,
-                         parent_phone=request.form.get('parent_phone'), password=request.form.get('password'))
-            db.session.add(new_u); db.session.commit()
-            session.update({'u_id': new_u.id, 'role': 'student', 'username': new_u.full_name, 'phone': new_u.username})
-            return redirect(url_for('student_dashboard'))
-    return render_template('register.html')
-
 @app.route('/admin_pro')
 def admin_pro():
     if session.get('role') != 'admin': return redirect(url_for('login'))
-    return render_template('admin_pro.html', courses=Course.query.all(),
-                           students=User.query.filter_by(role='student').all())
+    return render_template('admin_pro.html', courses=Course.query.all(), students=User.query.filter_by(role='student').all())
+
+# وظيفة تعديل الدرس الجديدة
+@app.route('/edit_lesson/<int:id>', methods=['POST'])
+def edit_lesson(id):
+    if session.get('role') == 'admin':
+        lesson = Lesson.query.get(id)
+        if lesson:
+            lesson.title = request.form.get('title')
+            lesson.video_url = request.form.get('video_url')
+            lesson.pdf_url = request.form.get('pdf_url')
+            db.session.commit()
+    return redirect(url_for('admin_pro'))
+
+# وظيفة حذف الدرس
+@app.route('/delete_lesson/<int:id>')
+def delete_lesson(id):
+    if session.get('role') == 'admin':
+        lesson = Lesson.query.get(id)
+        db.session.delete(lesson)
+        db.session.commit()
+    return redirect(url_for('admin_pro'))
 
 @app.route('/student_dashboard')
 def student_dashboard():
