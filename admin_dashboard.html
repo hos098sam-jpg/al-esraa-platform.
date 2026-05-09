@@ -2,132 +2,54 @@
 <html dir="rtl" lang="ar">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم الاحترافية | ميس إسراء فرج</title>
+    <title>لوحة التحكم | ميس إسراء فرج</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
     <style>@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap'); body{font-family: 'Cairo', sans-serif;}</style>
 </head>
 <body class="bg-gray-50 pb-20">
-
-    <nav class="bg-blue-900 text-white p-4 shadow-xl mb-8 flex justify-between items-center">
-        <h1 class="text-xl font-bold flex items-center gap-2">
-            <span class="iconify" data-icon="solar:shield-user-bold"></span> لوحة إدارة المنصة (النسخة الكاملة)
-        </h1>
-        <a href="/logout" class="bg-red-600 px-4 py-2 rounded-xl text-sm font-bold">خروج</a>
+    <nav class="bg-blue-900 text-white p-4 shadow-lg mb-8 flex justify-between items-center">
+        <h1 class="text-xl font-bold">لوحة الإدارة الاحترافية</h1>
+        <a href="/logout" class="bg-red-600 px-4 py-2 rounded-lg">خروج</a>
     </nav>
 
     <div class="max-w-5xl mx-auto p-4 space-y-10">
-
-        <section class="bg-white rounded-[2rem] shadow-md p-6 border-t-8 border-blue-600">
-            <h2 class="text-xl font-black mb-6 flex items-center gap-2">إضافة كورس جديد 🖼️</h2>
-            <form action="/add_course" method="POST" enctype="multipart/form-data" class="grid md:grid-cols-2 gap-4">
-                <input type="text" name="title" placeholder="اسم الكورس" required class="p-4 rounded-2xl border">
-                <input type="number" name="price" placeholder="السعر" required class="p-4 rounded-2xl border">
-                <div class="md:col-span-2">
-                    <label class="block text-sm font-bold text-gray-600 mb-2">ارفع صورة للكورس</label>
-                    <input type="file" name="course_image" accept="image/*" class="w-full">
-                </div>
-                <button class="md:col-span-2 bg-blue-600 text-white font-bold py-4 rounded-2xl">حفظ الكورس ✅</button>
+        <section class="bg-white rounded-3xl shadow p-6 border-t-8 border-blue-600">
+            <h2 class="text-xl font-bold mb-4">إضافة كورس جديد (سعر 0 = مجاني)</h2>
+            <form action="/add_course" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="text" name="title" placeholder="اسم الكورس" required class="p-4 border rounded-xl">
+                <input type="number" name="price" placeholder="السعر (0 للمجاني)" required class="p-4 border rounded-xl">
+                <input type="file" name="course_image" class="md:col-span-2">
+                <button class="md:col-span-2 bg-blue-600 text-white p-4 rounded-xl font-bold">حفظ الكورس ✅</button>
             </form>
         </section>
 
-        <section class="bg-white rounded-[2rem] shadow-md p-6 border-t-8 border-purple-600">
-            <h2 class="text-xl font-black mb-6">إضافة درس واختبار (أسئلة لانهائية) 🎥</h2>
-            <form action="/add_lesson_full" method="POST" enctype="multipart/form-data" class="space-y-6">
-                <div class="grid md:grid-cols-2 gap-4">
-                    <select name="course_id" required class="p-4 rounded-2xl border bg-gray-50">
-                        {% for c in courses %} <option value="{{c.id}}">{{c.title}}</option> {% endfor %}
-                    </select>
-                    <input type="text" name="lesson_title" placeholder="عنوان الدرس" required class="p-4 rounded-2xl border">
-                </div>
-                <div class="grid md:grid-cols-2 gap-4">
-                    <input type="text" name="video_url" placeholder="رابط الفيديو" class="p-4 rounded-2xl border">
-                    <input type="text" name="pdf_url" placeholder="رابط PDF" class="p-4 rounded-2xl border">
-                </div>
-                <div id="q_area" class="space-y-4">
-                    <h3 class="font-bold text-red-600 italic">الأسئلة:</h3>
-                    <div class="p-5 bg-gray-50 rounded-3xl border relative">
-                        <textarea name="q_text[]" placeholder="اكتب السؤال هنا" class="w-full p-3 rounded-xl border mb-3 h-20"></textarea>
-                        <input type="file" name="q_image[]" accept="image/*" class="block mb-3 text-xs">
-                        <div class="grid grid-cols-2 gap-3">
-                            <input type="text" name="q_a[]" placeholder="الاختيار A" class="p-3 border rounded-xl">
-                            <input type="text" name="q_b[]" placeholder="الاختيار B" class="p-3 border rounded-xl">
-                            <input type="text" name="q_c[]" placeholder="الاختيار C" class="p-3 border rounded-xl">
-                            <input type="text" name="q_d[]" placeholder="الاختيار D" class="p-3 border rounded-xl">
-                        </div>
-                        <select name="q_correct[]" class="w-full mt-3 p-3 bg-yellow-100 rounded-xl font-bold">
-                            <option value="A">الصح هو A</option><option value="B">الصح هو B</option>
-                            <option value="C">الصح هو C</option><option value="D">الصح هو D</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="flex gap-4">
-                    <button type="button" onclick="addQ()" class="bg-gray-800 text-white px-6 py-4 rounded-2xl font-bold">+ إضافة سؤال آخر</button>
-                    <button type="submit" class="flex-1 bg-purple-600 text-white font-black py-4 rounded-2xl shadow-xl">حفظ الدرس والامتحان بالكامل 🚀</button>
-                </div>
+        <section class="bg-white rounded-3xl shadow p-6 border-t-8 border-orange-500">
+            <h2 class="text-xl font-bold mb-4">توليد أكواد الاشتراك</h2>
+            <form action="/generate_codes" method="POST" class="flex gap-4 mb-6">
+                <input type="number" name="count" placeholder="العدد" required class="p-4 border rounded-xl flex-1">
+                <button class="bg-orange-600 text-white px-8 rounded-xl font-bold">توليد الآن</button>
             </form>
-        </section>
-
-        <section class="bg-white rounded-[2rem] shadow-md p-6 border-t-8 border-green-600">
-            <h2 class="text-xl font-black mb-6">متابعة الطلاب 👥</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-right">
-                    <thead>
-                        <tr class="border-b text-gray-500">
-                            <th class="p-3">الاسم</th>
-                            <th class="p-3">الموبايل</th>
-                            <th class="p-3">ولي الأمر</th>
-                            <th class="p-3">النتائج</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for s in students %}
-                        <tr class="border-b">
-                            <td class="p-3 font-bold">{{ s.full_name }}</td>
-                            <td class="p-3">{{ s.username }}</td>
-                            <td class="p-3">{{ s.parent_phone }}</td>
-                            <td class="p-3">
-                                <a href="/student_results/{{s.id}}" class="text-blue-600 underline text-sm">عرض النتائج</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            
+            <h3 class="font-bold text-gray-700 mb-2 italic text-sm">الأكواد المتاحة (انسخها للطلاب):</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 max-h-48 overflow-y-auto bg-gray-50 p-4 rounded-xl border">
+                {% for c in codes %}
+                <div class="bg-white border border-orange-200 p-2 rounded text-center font-mono font-bold text-orange-700 text-sm select-all">
+                    {{ c.code }}
+                </div>
+                {% endfor %}
             </div>
         </section>
 
-        <section class="bg-white rounded-[2rem] shadow-md p-6 border-t-8 border-orange-600">
-            <h2 class="text-xl font-black mb-6 text-orange-900">توليد أكواد الاشتراك 🔑</h2>
-            <form action="/generate_codes" method="POST" class="flex gap-4">
-                <input type="number" name="count" placeholder="عدد الأكواد" required class="flex-1 p-4 rounded-2xl border">
-                <button class="bg-orange-600 text-white font-bold px-8 py-4 rounded-2xl">توليد الآن</button>
-            </form>
+        <section class="bg-white rounded-3xl shadow p-6 border-t-8 border-green-600">
+            <h2 class="text-xl font-bold mb-4">قائمة الطلاب</h2>
+            <table class="w-full text-right border-collapse">
+                <tr class="border-b text-gray-400 text-sm"><th class="p-2">الاسم</th><th class="p-2">الموبايل</th></tr>
+                {% for s in students %}
+                <tr class="border-b text-sm"><td class="p-2 font-bold">{{ s.full_name }}</td><td class="p-2">{{ s.username }}</td></tr>
+                {% endfor %}
+            </table>
         </section>
-
     </div>
-
-    <script>
-        function addQ() {
-            const area = document.getElementById('q_area');
-            const div = document.createElement('div');
-            div.className = "p-5 bg-gray-50 rounded-3xl border relative mt-4";
-            div.innerHTML = `
-                <textarea name="q_text[]" placeholder="اكتب السؤال هنا" class="w-full p-3 rounded-xl border mb-3 h-20"></textarea>
-                <input type="file" name="q_image[]" accept="image/*" class="block mb-3 text-xs">
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="text" name="q_a[]" placeholder="الاختيار A" class="p-3 border rounded-xl">
-                    <input type="text" name="q_b[]" placeholder="الاختيار B" class="p-3 border rounded-xl">
-                    <input type="text" name="q_c[]" placeholder="الاختيار C" class="p-3 border rounded-xl">
-                    <input type="text" name="q_d[]" placeholder="الاختيار D" class="p-3 border rounded-xl">
-                </div>
-                <select name="q_correct[]" class="w-full mt-3 p-3 bg-yellow-100 rounded-xl font-bold">
-                    <option value="A">الصح هو A</option><option value="B">الصح هو B</option>
-                    <option value="C">الصح هو C</option><option value="D">الصح هو D</option>
-                </select>
-                <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 left-2 bg-red-500 text-white rounded-full w-8 h-8">X</button>`;
-            area.appendChild(div);
-        }
-    </script>
 </body>
 </html>
