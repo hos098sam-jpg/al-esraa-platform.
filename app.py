@@ -1,10 +1,14 @@
-import os, random, string
+import os
+import random
+import string
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
-app = Flask(__name__)
-# تحديث مفتاح الأمان ليكون خاص بالمنصة
+# إعداد التطبيق مع تحديد مجلد القوالب بدقة ليتوافق مع السيرفرات
+app = Flask(__name__, template_folder='templates', static_folder='static')
+
+# تحديث مفتاح الأمان
 app.secret_key = "al_esraa_ultimate_v14_2026"
 
 # إعداد قاعدة البيانات
@@ -70,7 +74,6 @@ class SubscriptionCode(db.Model):
 # إنشاء قاعدة البيانات وتعيين الإدمن (مس إسراء فرج)
 with app.app_context():
     db.create_all()
-    # تم تغيير الرقم والاسم هنا كما طلبت
     if not User.query.filter_by(username="01063839943").first():
         db.session.add(User(
             full_name="إسراء فرج",
@@ -138,7 +141,7 @@ def add_lesson_full():
         new_exam = Exam(duration=int(request.form.get('duration') or 30), lesson_id=new_l.id)
         db.session.add(new_exam); db.session.flush()
 
-        for i in range(1, 6): # يدعم حتى 5 أسئلة لكل درس
+        for i in range(1, 6):
             txt = request.form.get(f'q{i}_text')
             if txt:
                 q = Question(text=txt, option_a=request.form.get(f'q{i}_a'), option_b=request.form.get(f'q{i}_b'),
@@ -146,13 +149,6 @@ def add_lesson_full():
                              correct_answer=request.form.get(f'q{i}_correct'), exam_id=new_exam.id)
                 db.session.add(q)
         db.session.commit()
-    return redirect(url_for('admin_pro'))
-
-@app.route('/delete_course/<int:id>')
-def delete_course(id):
-    if session.get('role') == 'admin':
-        c = Course.query.get(id)
-        db.session.delete(c); db.session.commit()
     return redirect(url_for('admin_pro'))
 
 @app.route('/student_dashboard')
@@ -209,4 +205,6 @@ def logout():
     session.clear(); return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # تحديد المنفذ تلقائياً ليتناسب مع Railway أو Render
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
