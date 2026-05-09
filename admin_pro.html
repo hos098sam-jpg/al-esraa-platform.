@@ -2,75 +2,116 @@
 <html dir="rtl" lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة التحكم | ميس إسراء فرج</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم الاحترافية | ميس إسراء فرج</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap'); body{font-family: 'Cairo', sans-serif;}</style>
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
+        body { font-family: 'Cairo', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
+    </style>
 </head>
-<body class="bg-gray-100 pb-20">
+<body class="bg-gray-50 pb-20">
 
-    <nav class="bg-blue-900 text-white p-4 shadow-xl mb-8 flex justify-between items-center">
-        <h1 class="text-2xl font-black italic">لوحة التحكم الاحترافية 🛠️</h1>
-        <a href="/logout" class="bg-red-600 px-6 py-2 rounded-xl font-bold">خروج</a>
+    <nav class="gradient-bg text-white p-4 shadow-2xl mb-8 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center gap-2">
+            <span class="iconify text-3xl" data-icon="mdi:shield-check"></span>
+            <h1 class="text-xl md:text-2xl font-black italic">لوحة تحكم المنصة 🛠️</h1>
+        </div>
+        <a href="/logout" class="bg-red-500 hover:bg-red-700 px-6 py-2 rounded-2xl font-bold transition-all shadow-lg">خروج</a>
     </nav>
 
-    <div class="max-w-6xl mx-auto p-4 space-y-12">
+    <div class="max-w-6xl mx-auto p-4 space-y-10">
 
-        <div class="grid md:grid-cols-2 gap-8">
-            <section class="bg-white p-6 rounded-3xl shadow-lg border-t-8 border-blue-600">
-                <h2 class="text-xl font-bold mb-4">إضافة كورس جديد</h2>
-                <form action="/add_course" method="POST" class="space-y-3">
-                    <input type="text" name="title" placeholder="اسم الكورس" required class="w-full p-3 border rounded-xl">
-                    <input type="number" name="price" placeholder="السعر" required class="w-full p-3 border rounded-xl">
-                    <button class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">حفظ الكورس ✅</button>
-                </form>
-            </section>
-
-            <section class="bg-white p-6 rounded-3xl shadow-lg border-t-8 border-purple-600">
-                <h2 class="text-xl font-bold mb-4">إضافة درس جديد</h2>
-                <form action="/add_lesson_full" method="POST" class="space-y-4">
-                    <select name="course_id" class="w-full p-3 border rounded-xl bg-gray-50">
-                        {% for c in courses %} <option value="{{c.id}}">{{c.title}}</option> {% endfor %}
-                    </select>
-                    <input type="text" name="lesson_title" placeholder="عنوان الدرس" required class="w-full p-3 border rounded-xl">
-                    <input type="text" name="video_url" placeholder="رابط الفيديو" class="w-full p-3 border rounded-xl">
-                    <input type="text" name="pdf_url" placeholder="رابط PDF" class="w-full p-3 border rounded-xl">
-                    <button class="w-full bg-purple-600 text-white py-3 rounded-xl font-bold">حفظ الدرس 🎥</button>
-                </form>
-            </section>
-        </div>
-
-        <section class="bg-white p-6 rounded-3xl shadow-lg border-t-8 border-indigo-600">
-            <h2 class="text-xl font-bold mb-6 text-indigo-700 underline">إدارة وتعديل دروس المنصة ✍️</h2>
-            {% for c in courses %}
-            <div class="mb-6 p-4 bg-indigo-50 rounded-2xl">
-                <h3 class="font-black mb-4 text-indigo-900 border-b border-indigo-200 pb-2 italic">كورس: {{ c.title }}</h3>
-                <div class="space-y-3">
-                    {% for lesson in c.lessons %}
-                    <form action="/edit_lesson/{{ lesson.id }}" method="POST" class="bg-white p-3 rounded-xl shadow-sm flex flex-wrap gap-2 items-center">
-                        <input type="text" name="title" value="{{ lesson.title }}" class="flex-1 min-w-[150px] p-2 border rounded-lg text-sm">
-                        <input type="text" name="video_url" value="{{ lesson.video_url }}" class="flex-1 min-w-[150px] p-2 border rounded-lg text-sm">
-                        <input type="text" name="pdf_url" value="{{ lesson.pdf_url }}" class="flex-1 min-w-[150px] p-2 border rounded-lg text-sm">
-                        <button type="submit" class="bg-green-500 text-white px-3 py-2 rounded-lg text-xs font-bold">حفظ ✅</button>
-                        <a href="/delete_lesson/{{ lesson.id }}" onclick="return confirm('حذف؟')" class="bg-red-500 text-white px-3 py-2 rounded-lg text-xs font-bold">حذف 🗑️</a>
-                    </form>
-                    {% endfor %}
+        <section class="bg-white p-6 rounded-[2.5rem] shadow-xl border-t-[10px] border-blue-600">
+            <h2 class="text-2xl font-bold mb-6 flex items-center gap-2 text-blue-800">
+                <span class="iconify" data-icon="mdi:book-plus"></span> إضافة كورس جديد
+            </h2>
+            <form action="/add_course" method="POST" enctype="multipart/form-data" class="grid md:grid-cols-3 gap-4">
+                <input type="text" name="title" placeholder="اسم الكورس (مثلاً: التاريخ للثانوية)" required class="p-4 border-2 rounded-2xl focus:border-blue-500 outline-none">
+                <input type="number" name="price" placeholder="سعر الكورس (جنيه)" required class="p-4 border-2 rounded-2xl focus:border-blue-500 outline-none">
+                <div class="flex flex-col">
+                    <label class="text-sm font-bold text-gray-600 mb-1">صورة الكورس 🖼️</label>
+                    <input type="file" name="course_image" accept="image/*" class="text-sm">
                 </div>
-            </div>
-            {% endfor %}
+                <button class="md:col-span-3 bg-blue-600 hover:bg-blue-800 text-white py-4 rounded-2xl font-black text-lg transition-all transform hover:scale-[1.01] shadow-lg">حفظ الكورس الجديد ✅</button>
+            </form>
         </section>
 
-        <section class="bg-white p-6 rounded-3xl shadow-lg border-t-8 border-green-500 overflow-x-auto">
-            <h2 class="text-xl font-bold mb-4">متابعة الطلاب</h2>
-            <table class="w-full text-right">
-                <thead><tr class="bg-gray-50"><th class="p-3 border">الاسم</th><th class="p-3 border">الموبايل</th><th class="p-3 border">ولي الأمر</th><th class="p-3 border">النتائج</th></tr></thead>
+        <section class="bg-white p-6 rounded-[2.5rem] shadow-xl border-t-[10px] border-purple-600">
+            <h2 class="text-2xl font-bold mb-6 flex items-center gap-2 text-purple-800">
+                <span class="iconify" data-icon="mdi:video-plus"></span> إضافة درس جديد واختبار
+            </h2>
+            <form action="/add_lesson_full" method="POST" enctype="multipart/form-data" class="space-y-6">
+                <div class="grid md:grid-cols-2 gap-4">
+                    <select name="course_id" class="p-4 border-2 rounded-2xl bg-gray-50 font-bold">
+                        {% for c in courses %} <option value="{{c.id}}">{{c.title}}</option> {% endfor %}
+                    </select>
+                    <input type="text" name="lesson_title" placeholder="عنوان الدرس" required class="p-4 border-2 rounded-2xl outline-none focus:border-purple-500">
+                    <input type="text" name="video_url" placeholder="رابط فيديو اليوتيوب" class="p-4 border-2 rounded-2xl outline-none focus:border-purple-500">
+                    <input type="text" name="pdf_url" placeholder="رابط ملف الـ PDF" class="p-4 border-2 rounded-2xl outline-none focus:border-purple-500">
+                </div>
+
+                <div id="questions-container" class="space-y-6">
+                    <h3 class="font-black text-lg text-red-600 underline">أسئلة الاختبار:</h3>
+                    <div class="q-item bg-gray-50 p-6 rounded-3xl border-2 border-dashed border-purple-300 relative">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <textarea name="q_text[]" placeholder="اكتب السؤال هنا..." class="w-full p-3 border rounded-xl h-20"></textarea>
+                            <div class="flex flex-col justify-center">
+                                <label class="text-xs font-bold text-gray-500">صورة للسؤال (اختياري)</label>
+                                <input type="file" name="q_image[]" accept="image/*">
+                            </div>
+                            <input type="text" name="q_a[]" placeholder="الاختيار A" class="p-2 border rounded-lg">
+                            <input type="text" name="q_b[]" placeholder="الاختيار B" class="p-2 border rounded-lg">
+                            <input type="text" name="q_c[]" placeholder="الاختيار C" class="p-2 border rounded-lg">
+                            <input type="text" name="q_d[]" placeholder="الاختيار D" class="p-2 border rounded-lg">
+                            <select name="q_correct[]" class="p-3 bg-yellow-100 rounded-xl font-bold border-2 border-yellow-400">
+                                <option value="A">الإجابة الصحيحة هي A</option>
+                                <option value="B">الإجابة الصحيحة هي B</option>
+                                <option value="C">الإجابة الصحيحة هي C</option>
+                                <option value="D">الإجابة الصحيحة هي D</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button type="button" onclick="addQuestion()" class="flex-1 bg-gray-800 text-white py-3 rounded-2xl font-bold flex items-center justify-center gap-2">
+                        <span class="iconify" data-icon="mdi:plus-circle"></span> إضافة سؤال آخر
+                    </button>
+                    <button type="submit" class="flex-[2] bg-purple-600 hover:bg-purple-800 text-white py-4 rounded-2xl font-black text-xl shadow-xl transition-all">
+                        حفظ الدرس والامتحان بالكامل 🚀
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section class="bg-white p-6 rounded-[2.5rem] shadow-xl border-t-[10px] border-green-500 overflow-x-auto">
+             <h2 class="text-2xl font-bold mb-6 text-green-800 flex items-center gap-2">
+                <span class="iconify" data-icon="mdi:account-group"></span> نتائج ومتابعة الطلاب
+            </h2>
+            <table class="w-full text-right border-collapse">
+                <thead>
+                    <tr class="bg-green-50 text-green-900">
+                        <th class="p-4 border">اسم الطالب</th>
+                        <th class="p-4 border">رقم الهاتف</th>
+                        <th class="p-4 border">نتائج الامتحانات الأخيرة</th>
+                    </tr>
+                </thead>
                 <tbody>
                     {% for s in students %}
-                    <tr class="border-b">
-                        <td class="p-3">{{ s.full_name }}</td>
-                        <td class="p-3 font-mono">{{ s.username }}</td>
-                        <td class="p-3 font-mono">{{ s.parent_phone }}</td>
-                        <td class="p-3 text-xs">
-                            {% for res in s.results %}[{{res.lesson_title}}: {{res.score}}/{{res.total}}] {% endfor %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="p-4 border font-bold">{{ s.full_name }}</td>
+                        <td class="p-4 border font-mono">{{ s.username }}</td>
+                        <td class="p-4 border">
+                            <div class="flex flex-wrap gap-2 text-xs">
+                                {% for res in s.results %}
+                                <span class="bg-blue-100 text-blue-800 p-1 px-2 rounded-lg border border-blue-200">
+                                    {{ res.lesson_title }}: <b>{{ res.score }}/{{ res.total }}</b>
+                                </span>
+                                {% endfor %}
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
@@ -78,29 +119,38 @@
             </table>
         </section>
 
-        <div class="grid md:grid-cols-2 gap-8">
-            <section class="bg-white p-6 rounded-3xl shadow-lg border-t-8 border-red-500">
-                <h2 class="text-xl font-bold mb-4">حذف كورسات</h2>
-                {% for c in courses %}
-                <div class="flex justify-between items-center p-2 border-b text-sm">
-                    <span>{{ c.title }}</span>
-                    <a href="/delete_course/{{c.id}}" class="text-red-600 font-bold">حذف 🗑️</a>
-                </div>
-                {% endfor %}
-            </section>
-
-            <section class="bg-white p-6 rounded-3xl shadow-lg border-t-8 border-yellow-500">
-                <h2 class="text-xl font-bold mb-4">أكواد الاشتراك</h2>
-                <form action="/generate_codes" method="POST" class="flex gap-2 mb-2">
-                    <input type="number" name="count" placeholder="العدد" class="w-20 p-2 border rounded-xl">
-                    <button class="flex-1 bg-yellow-500 text-white font-bold rounded-xl">توليد</button>
-                </form>
-                <div class="bg-gray-900 p-3 rounded-xl text-yellow-400 font-mono text-center h-24 overflow-y-auto">
-                    {% for c in codes %} <span>{{ c.code }} </span> {% endfor %}
-                </div>
-            </section>
-        </div>
-
     </div>
+
+    <script>
+        function addQuestion() {
+            const container = document.getElementById('questions-container');
+            const newQ = document.createElement('div');
+            newQ.className = 'q-item bg-gray-50 p-6 rounded-3xl border-2 border-dashed border-purple-300 relative animate-pulse';
+            newQ.innerHTML = `
+                <div class="grid md:grid-cols-2 gap-4">
+                    <textarea name="q_text[]" placeholder="اكتب السؤال هنا..." class="w-full p-3 border rounded-xl h-20"></textarea>
+                    <div class="flex flex-col justify-center">
+                        <label class="text-xs font-bold text-gray-500">صورة للسؤال (اختياري)</label>
+                        <input type="file" name="q_image[]" accept="image/*">
+                    </div>
+                    <input type="text" name="q_a[]" placeholder="الاختيار A" class="p-2 border rounded-lg">
+                    <input type="text" name="q_b[]" placeholder="الاختيار B" class="p-2 border rounded-lg">
+                    <input type="text" name="q_c[]" placeholder="الاختيار C" class="p-2 border rounded-lg">
+                    <input type="text" name="q_d[]" placeholder="الاختيار D" class="p-2 border rounded-lg">
+                    <select name="q_correct[]" class="p-3 bg-yellow-100 rounded-xl font-bold border-2 border-yellow-400">
+                        <option value="A">الإجابة الصحيحة هي A</option>
+                        <option value="B">الإجابة الصحيحة هي B</option>
+                        <option value="C">الإجابة الصحيحة هي C</option>
+                        <option value="D">الإجابة الصحيحة هي D</option>
+                    </select>
+                </div>
+                <button type="button" onclick="this.parentElement.remove()" class="absolute -top-3 -left-3 bg-red-500 text-white rounded-full p-1 shadow-lg hover:scale-110 transition-all">
+                    <span class="iconify" data-icon="mdi:close-circle"></span>
+                </button>
+            `;
+            container.appendChild(newQ);
+            setTimeout(() => newQ.classList.remove('animate-pulse'), 500);
+        }
+    </script>
 </body>
 </html>
