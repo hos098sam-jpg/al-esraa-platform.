@@ -12,7 +12,7 @@
 
     <nav class="bg-blue-900 text-white p-4 shadow-xl mb-8 flex justify-between items-center">
         <h1 class="text-xl font-bold flex items-center gap-2">
-            <span class="iconify" data-icon="solar:shield-user-bold"></span> لوحة إدارة المنصة (النسخة الاحترافية)
+            <span class="iconify" data-icon="solar:shield-user-bold"></span> لوحة إدارة المنصة (النسخة الكاملة)
         </h1>
         <a href="/logout" class="bg-red-600 px-4 py-2 rounded-xl text-sm font-bold">خروج</a>
     </nav>
@@ -20,12 +20,12 @@
     <div class="max-w-5xl mx-auto p-4 space-y-10">
 
         <section class="bg-white rounded-[2rem] shadow-md p-6 border-t-8 border-blue-600">
-            <h2 class="text-xl font-black mb-6">إضافة كورس جديد 🖼️</h2>
+            <h2 class="text-xl font-black mb-6 flex items-center gap-2">إضافة كورس جديد 🖼️</h2>
             <form action="/add_course" method="POST" enctype="multipart/form-data" class="grid md:grid-cols-2 gap-4">
                 <input type="text" name="title" placeholder="اسم الكورس" required class="p-4 rounded-2xl border">
                 <input type="number" name="price" placeholder="السعر" required class="p-4 rounded-2xl border">
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-bold text-gray-600 mb-2">ارفع صورة للكورس من جهازك</label>
+                    <label class="block text-sm font-bold text-gray-600 mb-2">ارفع صورة للكورس</label>
                     <input type="file" name="course_image" accept="image/*" class="w-full">
                 </div>
                 <button class="md:col-span-2 bg-blue-600 text-white font-bold py-4 rounded-2xl">حفظ الكورس ✅</button>
@@ -45,9 +45,8 @@
                     <input type="text" name="video_url" placeholder="رابط الفيديو" class="p-4 rounded-2xl border">
                     <input type="text" name="pdf_url" placeholder="رابط PDF" class="p-4 rounded-2xl border">
                 </div>
-
                 <div id="q_area" class="space-y-4">
-                    <h3 class="font-bold text-red-600 italic">الأسئلة (اضغط "إضافة سؤال" لزيادة العدد):</h3>
+                    <h3 class="font-bold text-red-600 italic">الأسئلة:</h3>
                     <div class="p-5 bg-gray-50 rounded-3xl border relative">
                         <textarea name="q_text[]" placeholder="اكتب السؤال هنا" class="w-full p-3 rounded-xl border mb-3 h-20"></textarea>
                         <input type="file" name="q_image[]" accept="image/*" class="block mb-3 text-xs">
@@ -63,11 +62,46 @@
                         </select>
                     </div>
                 </div>
-
                 <div class="flex gap-4">
                     <button type="button" onclick="addQ()" class="bg-gray-800 text-white px-6 py-4 rounded-2xl font-bold">+ إضافة سؤال آخر</button>
                     <button type="submit" class="flex-1 bg-purple-600 text-white font-black py-4 rounded-2xl shadow-xl">حفظ الدرس والامتحان بالكامل 🚀</button>
                 </div>
+            </form>
+        </section>
+
+        <section class="bg-white rounded-[2rem] shadow-md p-6 border-t-8 border-green-600">
+            <h2 class="text-xl font-black mb-6">متابعة الطلاب 👥</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-right">
+                    <thead>
+                        <tr class="border-b text-gray-500">
+                            <th class="p-3">الاسم</th>
+                            <th class="p-3">الموبايل</th>
+                            <th class="p-3">ولي الأمر</th>
+                            <th class="p-3">النتائج</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in students %}
+                        <tr class="border-b">
+                            <td class="p-3 font-bold">{{ s.full_name }}</td>
+                            <td class="p-3">{{ s.username }}</td>
+                            <td class="p-3">{{ s.parent_phone }}</td>
+                            <td class="p-3">
+                                <a href="/student_results/{{s.id}}" class="text-blue-600 underline text-sm">عرض النتائج</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-[2rem] shadow-md p-6 border-t-8 border-orange-600">
+            <h2 class="text-xl font-black mb-6 text-orange-900">توليد أكواد الاشتراك 🔑</h2>
+            <form action="/generate_codes" method="POST" class="flex gap-4">
+                <input type="number" name="count" placeholder="عدد الأكواد" required class="flex-1 p-4 rounded-2xl border">
+                <button class="bg-orange-600 text-white font-bold px-8 py-4 rounded-2xl">توليد الآن</button>
             </form>
         </section>
 
