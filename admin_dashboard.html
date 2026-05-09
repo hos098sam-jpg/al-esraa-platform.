@@ -3,85 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الإدارة | ميس إسراء فرج</title>
+    <title>لوحة التحكم الاحترافية | ميس إسراء فرج</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
-        body { font-family: 'Cairo', sans-serif; }
-    </style>
+    <style>@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap'); body{font-family: 'Cairo', sans-serif;}</style>
 </head>
 <body class="bg-gray-50 pb-20">
 
-    <nav class="bg-blue-900 text-white p-4 shadow-xl mb-8 flex justify-between items-center sticky top-0 z-50">
+    <nav class="bg-blue-900 text-white p-4 shadow-xl mb-8 flex justify-between items-center">
         <h1 class="text-xl font-bold flex items-center gap-2">
-            <span class="iconify" data-icon="solar:shield-user-bold"></span> لوحة التحكم الاحترافية
+            <span class="iconify" data-icon="solar:shield-user-bold"></span> لوحة إدارة المنصة (النسخة الاحترافية)
         </h1>
-        <a href="/logout" class="bg-red-600 hover:bg-red-700 px-5 py-2 rounded-xl text-sm font-bold transition">خروج</a>
+        <a href="/logout" class="bg-red-600 px-4 py-2 rounded-xl text-sm font-bold">خروج</a>
     </nav>
 
     <div class="max-w-5xl mx-auto p-4 space-y-10">
 
-        <section class="bg-white rounded-[2rem] shadow-md border border-gray-100 p-6">
-            <h2 class="text-xl font-black text-blue-900 mb-6 flex items-center gap-2">
-                <span class="iconify" data-icon="solar:book-bookmark-bold"></span> إضافة كورس جديد
-            </h2>
+        <section class="bg-white rounded-[2rem] shadow-md p-6 border-t-8 border-blue-600">
+            <h2 class="text-xl font-black mb-6">إضافة كورس جديد 🖼️</h2>
             <form action="/add_course" method="POST" enctype="multipart/form-data" class="grid md:grid-cols-2 gap-4">
-                <input type="text" name="title" placeholder="عنوان الكورس" required class="p-4 rounded-2xl border border-gray-300 outline-none focus:border-blue-500">
-                <input type="number" name="price" placeholder="سعر الكورس" required class="p-4 rounded-2xl border border-gray-300 outline-none focus:border-blue-500">
+                <input type="text" name="title" placeholder="اسم الكورس" required class="p-4 rounded-2xl border">
+                <input type="number" name="price" placeholder="السعر" required class="p-4 rounded-2xl border">
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-bold text-gray-600 mb-2">صورة غلاف الكورس 🖼️</label>
-                    <input type="file" name="course_image" accept="image/*" class="w-full text-sm text-gray-500">
+                    <label class="block text-sm font-bold text-gray-600 mb-2">ارفع صورة للكورس من جهازك</label>
+                    <input type="file" name="course_image" accept="image/*" class="w-full">
                 </div>
-                <button class="md:col-span-2 bg-blue-600 hover:bg-blue-800 text-white font-bold py-4 rounded-2xl transition shadow-lg">حفظ الكورس الآن ✅</button>
+                <button class="md:col-span-2 bg-blue-600 text-white font-bold py-4 rounded-2xl">حفظ الكورس ✅</button>
             </form>
         </section>
 
-        <section class="bg-white rounded-[2rem] shadow-md border border-gray-100 p-6">
-            <h2 class="text-xl font-black text-purple-900 mb-6 flex items-center gap-2">
-                <span class="iconify" data-icon="solar:videocamera-record-bold"></span> إضافة درس جديد وامتحان
-            </h2>
+        <section class="bg-white rounded-[2rem] shadow-md p-6 border-t-8 border-purple-600">
+            <h2 class="text-xl font-black mb-6">إضافة درس واختبار (أسئلة لانهائية) 🎥</h2>
             <form action="/add_lesson_full" method="POST" enctype="multipart/form-data" class="space-y-6">
                 <div class="grid md:grid-cols-2 gap-4">
-                    <select name="course_id" required class="p-4 rounded-2xl border border-gray-300 bg-gray-50">
-                        <option value="">اختر الكورس التابع له</option>
+                    <select name="course_id" required class="p-4 rounded-2xl border bg-gray-50">
                         {% for c in courses %} <option value="{{c.id}}">{{c.title}}</option> {% endfor %}
                     </select>
-                    <input type="text" name="lesson_title" placeholder="عنوان الدرس" required class="p-4 rounded-2xl border border-gray-300 outline-none focus:border-purple-500">
+                    <input type="text" name="lesson_title" placeholder="عنوان الدرس" required class="p-4 rounded-2xl border">
                 </div>
                 <div class="grid md:grid-cols-2 gap-4">
-                    <input type="text" name="video_url" placeholder="رابط فيديو اليوتيوب" class="p-4 rounded-2xl border border-gray-300 outline-none focus:border-purple-500">
-                    <input type="text" name="pdf_url" placeholder="رابط ملف PDF" class="p-4 rounded-2xl border border-gray-300 outline-none focus:border-purple-500">
+                    <input type="text" name="video_url" placeholder="رابط الفيديو" class="p-4 rounded-2xl border">
+                    <input type="text" name="pdf_url" placeholder="رابط PDF" class="p-4 rounded-2xl border">
                 </div>
 
-                <div id="questions_area" class="space-y-4">
-                    <h3 class="font-bold text-red-600 border-b pb-2">أسئلة الاختبار:</h3>
-                    <div class="p-5 bg-gray-50 rounded-3xl border border-gray-200 relative">
-                        <textarea name="q_text[]" placeholder="اكتب السؤال هنا..." class="w-full p-3 rounded-xl border mb-3 h-20"></textarea>
-                        <div class="mb-3">
-                            <label class="text-xs font-bold text-gray-500">صورة للسؤال (اختياري)</label>
-                            <input type="file" name="q_image[]" accept="image/*" class="block w-full text-xs">
-                        </div>
+                <div id="q_area" class="space-y-4">
+                    <h3 class="font-bold text-red-600 italic">الأسئلة (اضغط "إضافة سؤال" لزيادة العدد):</h3>
+                    <div class="p-5 bg-gray-50 rounded-3xl border relative">
+                        <textarea name="q_text[]" placeholder="اكتب السؤال هنا" class="w-full p-3 rounded-xl border mb-3 h-20"></textarea>
+                        <input type="file" name="q_image[]" accept="image/*" class="block mb-3 text-xs">
                         <div class="grid grid-cols-2 gap-3">
-                            <input type="text" name="q_a[]" placeholder="الاختيار A" class="p-3 border rounded-xl text-sm">
-                            <input type="text" name="q_b[]" placeholder="الاختيار B" class="p-3 border rounded-xl text-sm">
-                            <input type="text" name="q_c[]" placeholder="الاختيار C" class="p-3 border rounded-xl text-sm">
-                            <input type="text" name="q_d[]" placeholder="الاختيار D" class="p-3 border rounded-xl text-sm">
+                            <input type="text" name="q_a[]" placeholder="الاختيار A" class="p-3 border rounded-xl">
+                            <input type="text" name="q_b[]" placeholder="الاختيار B" class="p-3 border rounded-xl">
+                            <input type="text" name="q_c[]" placeholder="الاختيار C" class="p-3 border rounded-xl">
+                            <input type="text" name="q_d[]" placeholder="الاختيار D" class="p-3 border rounded-xl">
                         </div>
-                        <select name="q_correct[]" class="w-full mt-3 p-3 bg-yellow-100 border border-yellow-300 rounded-xl font-bold">
-                            <option value="A">الإجابة الصحيحة: A</option>
-                            <option value="B">الإجابة الصحيحة: B</option>
-                            <option value="C">الإجابة الصحيحة: C</option>
-                            <option value="D">الإجابة الصحيحة: D</option>
+                        <select name="q_correct[]" class="w-full mt-3 p-3 bg-yellow-100 rounded-xl font-bold">
+                            <option value="A">الصح هو A</option><option value="B">الصح هو B</option>
+                            <option value="C">الصح هو C</option><option value="D">الصح هو D</option>
                         </select>
                     </div>
                 </div>
 
-                <div class="flex flex-col md:flex-row gap-4 pt-4">
-                    <button type="button" onclick="addNewQuestion()" class="bg-gray-800 text-white px-6 py-4 rounded-2xl font-bold flex items-center justify-center gap-2">
-                        <span class="iconify" data-icon="solar:add-circle-bold"></span> إضافة سؤال آخر
-                    </button>
-                    <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-800 text-white font-black py-4 rounded-2xl shadow-xl transition">حفظ الدرس والامتحان بالكامل 🚀</button>
+                <div class="flex gap-4">
+                    <button type="button" onclick="addQ()" class="bg-gray-800 text-white px-6 py-4 rounded-2xl font-bold">+ إضافة سؤال آخر</button>
+                    <button type="submit" class="flex-1 bg-purple-600 text-white font-black py-4 rounded-2xl shadow-xl">حفظ الدرس والامتحان بالكامل 🚀</button>
                 </div>
             </form>
         </section>
@@ -89,29 +74,24 @@
     </div>
 
     <script>
-        function addNewQuestion() {
-            const area = document.getElementById('questions_area');
+        function addQ() {
+            const area = document.getElementById('q_area');
             const div = document.createElement('div');
-            div.className = "p-5 bg-gray-50 rounded-3xl border border-gray-200 relative mt-4";
+            div.className = "p-5 bg-gray-50 rounded-3xl border relative mt-4";
             div.innerHTML = `
-                <textarea name="q_text[]" placeholder="اكتب السؤال هنا..." class="w-full p-3 rounded-xl border mb-3 h-20"></textarea>
-                <div class="mb-3">
-                    <input type="file" name="q_image[]" accept="image/*" class="block w-full text-xs">
-                </div>
+                <textarea name="q_text[]" placeholder="اكتب السؤال هنا" class="w-full p-3 rounded-xl border mb-3 h-20"></textarea>
+                <input type="file" name="q_image[]" accept="image/*" class="block mb-3 text-xs">
                 <div class="grid grid-cols-2 gap-3">
-                    <input type="text" name="q_a[]" placeholder="الاختيار A" class="p-3 border rounded-xl text-sm">
-                    <input type="text" name="q_b[]" placeholder="الاختيار B" class="p-3 border rounded-xl text-sm">
-                    <input type="text" name="q_c[]" placeholder="الاختيار C" class="p-3 border rounded-xl text-sm">
-                    <input type="text" name="q_d[]" placeholder="الاختيار D" class="p-3 border rounded-xl text-sm">
+                    <input type="text" name="q_a[]" placeholder="الاختيار A" class="p-3 border rounded-xl">
+                    <input type="text" name="q_b[]" placeholder="الاختيار B" class="p-3 border rounded-xl">
+                    <input type="text" name="q_c[]" placeholder="الاختيار C" class="p-3 border rounded-xl">
+                    <input type="text" name="q_d[]" placeholder="الاختيار D" class="p-3 border rounded-xl">
                 </div>
-                <select name="q_correct[]" class="w-full mt-3 p-3 bg-yellow-100 border border-yellow-300 rounded-xl font-bold">
-                    <option value="A">الإجابة الصحيحة: A</option>
-                    <option value="B">الإجابة الصحيحة: B</option>
-                    <option value="C">الإجابة الصحيحة: C</option>
-                    <option value="D">الإجابة الصحيحة: D</option>
+                <select name="q_correct[]" class="w-full mt-3 p-3 bg-yellow-100 rounded-xl font-bold">
+                    <option value="A">الصح هو A</option><option value="B">الصح هو B</option>
+                    <option value="C">الصح هو C</option><option value="D">الصح هو D</option>
                 </select>
-                <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 left-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md">X</button>
-            `;
+                <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 left-2 bg-red-500 text-white rounded-full w-8 h-8">X</button>`;
             area.appendChild(div);
         }
     </script>
