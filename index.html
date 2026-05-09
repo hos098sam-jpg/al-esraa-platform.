@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة الإسراء التعليمية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap'); body { font-family: 'Cairo', sans-serif; }</style>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-blue-800 text-white p-4 shadow-xl flex justify-between items-center sticky top-0 z-50">
+        <h1 class="text-xl font-bold">منصة الإسراء 2026</h1>
+        <div>
+            {% if session.get('u_id') %}
+                <a href="/logout" class="bg-red-500 px-4 py-2 rounded-xl text-sm">خروج</a>
+            {% else %}
+                <a href="/register" class="bg-yellow-400 text-blue-900 px-4 py-2 rounded-xl font-bold text-sm">إنشاء حساب</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="p-6 max-w-6xl mx-auto">
+        {% if not session.get('u_id') %}
+        <div class="max-w-md mx-auto bg-white p-8 rounded-3xl shadow-2xl border mb-12">
+            <h2 class="text-2xl font-bold text-center text-blue-800 mb-6 underline">تسجيل دخول</h2>
+            <form action="/login" method="POST" class="space-y-4">
+                <input type="text" name="phone" placeholder="رقم الموبايل" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500" required>
+                <input type="password" name="password" placeholder="كلمة السر" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500" required>
+                <button type="submit" class="w-full bg-blue-700 text-white py-3 rounded-xl font-bold hover:bg-blue-900 transition-all shadow-lg">دخول للمنصة</button>
+            </form>
+        </div>
+        {% endif %}
+
+        <h2 class="text-3xl font-bold text-center mb-10 text-gray-800">📚 الكورسات المتاحة</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% for course in courses %}
+            <div class="bg-white rounded-3xl shadow-lg overflow-hidden border transition hover:-translate-y-2 duration-300">
+                <img src="{{ course.image_url or 'https://via.placeholder.com/400x220' }}" class="w-full h-48 object-cover">
+                <div class="p-6 text-center">
+                    <h3 class="font-bold text-xl text-gray-800">{{ course.title }}</h3>
+                    <div class="flex justify-between items-center mt-4">
+                        <span class="text-green-600 font-bold text-lg">{{ course.price }} ج.م</span>
+                        <a href="/student_dashboard" class="bg-blue-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-blue-700">دخول</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+</body>
+</html>

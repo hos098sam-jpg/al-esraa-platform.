@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ course.title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-md p-4 flex justify-between items-center max-w-6xl mx-auto mt-4 rounded-2xl border-b-4 border-blue-900">
+        <h1 class="text-xl font-black text-blue-900">{{ course.title }}</h1>
+        <a href="/student_dashboard" class="text-blue-700 font-bold underline italic">العودة للوحة التحكم</a>
+    </nav>
+
+    <div class="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+        {% for lesson in course.lessons %}
+        <div class="bg-white rounded-2xl shadow p-6 border-r-8 border-yellow-400">
+            <h3 class="text-xl font-bold mb-4">{{ lesson.title }}</h3>
+            <div class="aspect-video mb-4 rounded-xl overflow-hidden bg-black">
+                <iframe class="w-full h-full" src="{{ lesson.video_url.replace('watch?v=', 'embed/') }}" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div class="flex gap-4">
+                {% if lesson.pdf_url %}
+                <a href="{{ lesson.pdf_url }}" target="_blank" class="flex-1 text-center bg-red-600 text-white py-2 rounded-lg font-bold">تحميل PDF</a>
+                {% endif %}
+                {% if lesson.exam_url %}
+                <a href="{{ lesson.exam_url }}" target="_blank" class="flex-1 text-center bg-green-600 text-white py-2 rounded-lg font-bold">دخول الامتحان</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

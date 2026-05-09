@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>إنشاء حساب | منصة الإسراء</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
+        body { font-family: 'Cairo', sans-serif; }
+    </style>
+</head>
+<body class="bg-blue-900 flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md text-center">
+        <div class="mb-6">
+            <div class="bg-green-400 w-20 h-20 rounded-full flex items-center justify-center mx-auto shadow-lg text-4xl">📝</div>
+            <h2 class="text-3xl font-black text-blue-900 mt-4">إنشاء حساب جديد</h2>
+        </div>
+
+        <form action="/register" method="POST" class="space-y-4">
+            <input type="text" name="full_name" placeholder="الاسم بالكامل" required
+                   class="w-full p-4 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-blue-500 transition">
+
+            <input type="text" name="phone" placeholder="رقم موبايل الطالب" required
+                   class="w-full p-4 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-blue-500 transition">
+
+            <input type="text" name="parent_phone" placeholder="رقم موبايل ولي الأمر" required
+                   class="w-full p-4 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-blue-500 transition">
+
+            <input type="password" name="password" placeholder="كلمة السر" required
+                   class="w-full p-4 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-blue-500 transition">
+
+            <button type="submit" class="w-full bg-blue-900 text-white py-4 rounded-xl font-bold text-xl hover:bg-blue-800 transition shadow-lg">
+                إنشاء الحساب والدخول
+            </button>
+        </form>
+
+        <div class="mt-6 text-sm font-bold">
+            <p class="text-gray-500">لديك حساب بالفعل؟ <a href="/login" class="text-blue-700 hover:underline">سجل دخولك من هنا</a></p>
+        </div>
+    </div>
+</body>
+</html>
