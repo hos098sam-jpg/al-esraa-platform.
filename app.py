@@ -68,7 +68,7 @@ class ExamResult(db.Model):
 with app.app_context():
     db.create_all()
     if not User.query.filter_by(username="01063839943").first():
-        db.session.add(User(full_name="إسراء فرج", username="01063839943", parent_phone="Admin", password="123", role="admin"))
+        db.session.add(User(full_name="إسراء فرج", username="01063839943", parent_phone="Admin", password="esraa2026", role="admin"))
         db.session.commit()
 
 # دالة مساعدة لرفع الصور
@@ -124,5 +124,5 @@ def admin_pro():
 # [أكمل الكود بمسارات تسجيل الدخول السابقة]
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)
