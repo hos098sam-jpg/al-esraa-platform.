@@ -15,16 +15,16 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# قاعدة البيانات
+# قاعدة البيانات (تأكد من ربط PostgreSQL لاحقاً لثبات البيانات)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///al_esraa_pro.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# --- الجداول المطورة ---
+# --- الجداول ---
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     full_name = db.Column(db.String(100))
-    username = db.Column(db.String(50), unique=True)
+    username = db.Column(db.String(50), unique=True) # رقم الهاتف
     parent_phone = db.Column(db.String(50))
     password = db.Column(db.String(50))
     role = db.Column(db.String(10), default='student')
@@ -35,7 +35,7 @@ class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100))
     price = db.Column(db.Integer, default=0)
-    image_path = db.Column(db.String(200)) # صورة الكورس
+    image_path = db.Column(db.String(200))
     lessons = db.relationship('Lesson', backref='course', lazy=True, cascade="all, delete-orphan")
 
 class Lesson(db.Model):
@@ -49,7 +49,7 @@ class Lesson(db.Model):
 class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.Text)
-    image_path = db.Column(db.String(200)) # صورة السؤال
+    image_path = db.Column(db.String(200))
     option_a = db.Column(db.String(200))
     option_b = db.Column(db.String(200))
     option_c = db.Column(db.String(200))
@@ -65,31 +65,58 @@ class ExamResult(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     lesson_title = db.Column(db.String(100))
 
+# إنشاء قاعدة البيانات والإدمن الافتراضي
 with app.app_context():
     db.create_all()
     if not User.query.filter_by(username="01063839943").first():
         db.session.add(User(full_name="إسراء فرج", username="01063839943", parent_phone="Admin", password="esraa2026", role="admin"))
         db.session.commit()
 
-# دالة مساعدة لرفع الصور
+# دالة مساعدة لحفظ الصور
 def save_image(file):
     if file and file.filename != '':
-        filename = secure_filename(str(random.randint(1,1000)) + "_" + file.filename)
+        filename = secure_filename(str(random.randint(1000, 9999)) + "_" + file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         return f"static/uploads/{filename}"
     return None
 
 # --- المسارات (Routes) ---
+
 @app.route('/')
 def index():
     return render_template('index.html', courses=Course.query.all())
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        u = User.query.filter_by(username=request.form.get('phone'), password=request.form.get('password')).first()
+        if u:
+            session.update({'u_id': u.id, 'role': u.role, 'username': u.full_name})
+            return redirect(url_for('admin_pro' if u.role == 'admin' else 'student_dashboard'))
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        if not User.query.filter_by(username=request.form.get('phone')).first():
+            new_u = User(full_name=request.form.get('name'), username=request.form.get('phone'),
+                         parent_phone=request.form.get('parent_phone'), password=request.form.get('password'))
+            db.session.add(new_u); db.session.commit()
+            return redirect(url_for('login'))
+    return render_template('register.html')
+
+@app.route('/admin_pro')
+def admin_pro():
+    if session.get('role') != 'admin': return redirect(url_for('login'))
+    # هنا ربطنا الكود بملف admin_dashboard.html اللي أنت عايزه
+    return render_template('admin_dashboard.html', courses=Course.query.all(), students=User.query.filter_by(role='student').all())
 
 @app.route('/add_course', methods=['POST'])
 def add_course():
     if session.get('role') == 'admin':
         img = save_image(request.files.get('course_image'))
-        new_c = Course(title=request.form.get('title'), price=request.form.get('price'), image_path=img)
-        db.session.add(new_c); db.session.commit()
+        db.session.add(Course(title=request.form.get('title'), price=request.form.get('price'), image_path=img))
+        db.session.commit()
     return redirect(url_for('admin_pro'))
 
 @app.route('/add_lesson_full', methods=['POST'])
@@ -99,7 +126,6 @@ def add_lesson_full():
                         pdf_url=request.form.get('pdf_url'), course_id=request.form.get('course_id'))
         db.session.add(new_l); db.session.commit()
         
-        # إضافة الأسئلة (عدد غير محدود)
         q_texts = request.form.getlist('q_text[]')
         for i, text in enumerate(q_texts):
             if text:
@@ -115,13 +141,16 @@ def add_lesson_full():
         db.session.commit()
     return redirect(url_for('admin_pro'))
 
-@app.route('/admin_pro')
-def admin_pro():
-    if session.get('role') != 'admin': return redirect(url_for('login'))
-    return render_template('admin_pro.html', courses=Course.query.all(), students=User.query.filter_by(role='student').all())
+@app.route('/student_dashboard')
+def student_dashboard():
+    if not session.get('u_id'): return redirect(url_for('login'))
+    u = User.query.get(session['u_id'])
+    return render_template('student_dashboard.html', user=u, courses=Course.query.all())
 
-# (باقي مسارات تسجيل الدخول والحذف والنتائج كما هي...)
-# [أكمل الكود بمسارات تسجيل الدخول السابقة]
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
