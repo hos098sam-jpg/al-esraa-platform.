@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>لوحة التحكم | ميس إسراء فرج</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
     <style>@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap'); body{font-family: 'Cairo', sans-serif;}</style>
 </head>
 <body class="bg-gray-100 pb-20">
@@ -18,7 +17,7 @@
 
         <div class="grid md:grid-cols-2 gap-8">
             <section class="bg-white p-6 rounded-3xl shadow-lg border-t-8 border-blue-600">
-                <h2 class="text-xl font-bold mb-4">إضافة كورس بسعر</h2>
+                <h2 class="text-xl font-bold mb-4">إضافة كورس جديد</h2>
                 <form action="/add_course" method="POST" class="space-y-3">
                     <input type="text" name="title" placeholder="اسم الكورس" required class="w-full p-3 border rounded-xl">
                     <input type="number" name="price" placeholder="السعر" required class="w-full p-3 border rounded-xl">
@@ -27,42 +26,48 @@
             </section>
 
             <section class="bg-white p-6 rounded-3xl shadow-lg border-t-8 border-purple-600">
-                <h2 class="text-xl font-bold mb-4">إضافة درس + امتحان (5 أسئلة)</h2>
+                <h2 class="text-xl font-bold mb-4">إضافة درس جديد</h2>
                 <form action="/add_lesson_full" method="POST" class="space-y-4">
                     <select name="course_id" class="w-full p-3 border rounded-xl bg-gray-50">
                         {% for c in courses %} <option value="{{c.id}}">{{c.title}}</option> {% endfor %}
                     </select>
                     <input type="text" name="lesson_title" placeholder="عنوان الدرس" required class="w-full p-3 border rounded-xl">
-                    <input type="text" name="video_url" placeholder="رابط فيديو (يوتيوب أو Shorts)" class="w-full p-3 border rounded-xl">
-                    <input type="text" name="pdf_url" placeholder="رابط ملف PDF" class="w-full p-3 border rounded-xl">
-                    <input type="number" name="duration" placeholder="مدة الامتحان بالدقائق" class="w-full p-3 border rounded-xl">
-
-                    <div class="bg-gray-100 p-4 rounded-2xl">
-                        <p class="font-bold text-red-600 mb-2 underline">الأسئلة (مثال للسؤال الأول):</p>
-                        <input type="text" name="q1_text" placeholder="نص السؤال" class="w-full p-2 mb-2 border rounded">
-                        <div class="grid grid-cols-2 gap-2 mb-2 text-xs">
-                            <input type="text" name="q1_a" placeholder="A"> <input type="text" name="q1_b" placeholder="B">
-                            <input type="text" name="q1_c" placeholder="C"> <input type="text" name="q1_d" placeholder="D">
-                        </div>
-                        <select name="q1_correct" class="w-full p-2 bg-yellow-100 rounded border"><option value="A">الصح A</option><option value="B">الصح B</option><option value="C">الصح C</option><option value="D">الصح D</option></select>
-                        <p class="text-[10px] text-gray-500 mt-2 italic">* يمكنك تكرار هذه الخانات في الكود لإضافة حتى 5 أسئلة.</p>
-                    </div>
-                    <button class="w-full bg-purple-600 text-white py-3 rounded-xl font-bold">حفظ الدرس والامتحان 🎥</button>
+                    <input type="text" name="video_url" placeholder="رابط الفيديو" class="w-full p-3 border rounded-xl">
+                    <input type="text" name="pdf_url" placeholder="رابط PDF" class="w-full p-3 border rounded-xl">
+                    <button class="w-full bg-purple-600 text-white py-3 rounded-xl font-bold">حفظ الدرس 🎥</button>
                 </form>
             </section>
         </div>
 
+        <section class="bg-white p-6 rounded-3xl shadow-lg border-t-8 border-indigo-600">
+            <h2 class="text-xl font-bold mb-6 text-indigo-700 underline">إدارة وتعديل دروس المنصة ✍️</h2>
+            {% for c in courses %}
+            <div class="mb-6 p-4 bg-indigo-50 rounded-2xl">
+                <h3 class="font-black mb-4 text-indigo-900 border-b border-indigo-200 pb-2 italic">كورس: {{ c.title }}</h3>
+                <div class="space-y-3">
+                    {% for lesson in c.lessons %}
+                    <form action="/edit_lesson/{{ lesson.id }}" method="POST" class="bg-white p-3 rounded-xl shadow-sm flex flex-wrap gap-2 items-center">
+                        <input type="text" name="title" value="{{ lesson.title }}" class="flex-1 min-w-[150px] p-2 border rounded-lg text-sm">
+                        <input type="text" name="video_url" value="{{ lesson.video_url }}" class="flex-1 min-w-[150px] p-2 border rounded-lg text-sm">
+                        <input type="text" name="pdf_url" value="{{ lesson.pdf_url }}" class="flex-1 min-w-[150px] p-2 border rounded-lg text-sm">
+                        <button type="submit" class="bg-green-500 text-white px-3 py-2 rounded-lg text-xs font-bold">حفظ ✅</button>
+                        <a href="/delete_lesson/{{ lesson.id }}" onclick="return confirm('حذف؟')" class="bg-red-500 text-white px-3 py-2 rounded-lg text-xs font-bold">حذف 🗑️</a>
+                    </form>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+
         <section class="bg-white p-6 rounded-3xl shadow-lg border-t-8 border-green-500 overflow-x-auto">
-            <h2 class="text-xl font-bold mb-4">بيانات الطلاب ومتابعة ولي الأمر</h2>
-            <table class="w-full text-right border-collapse">
-                <thead><tr class="bg-gray-50">
-                    <th class="p-3 border">الاسم</th><th class="p-3 border">رقم الطالب</th><th class="p-3 border">ولي الأمر</th><th class="p-3 border">الدرجات</th>
-                </tr></thead>
+            <h2 class="text-xl font-bold mb-4">متابعة الطلاب</h2>
+            <table class="w-full text-right">
+                <thead><tr class="bg-gray-50"><th class="p-3 border">الاسم</th><th class="p-3 border">الموبايل</th><th class="p-3 border">ولي الأمر</th><th class="p-3 border">النتائج</th></tr></thead>
                 <tbody>
                     {% for s in students %}
                     <tr class="border-b">
                         <td class="p-3">{{ s.full_name }}</td>
-                        <td class="p-3 font-mono text-blue-600">{{ s.username }}</td>
+                        <td class="p-3 font-mono">{{ s.username }}</td>
                         <td class="p-3 font-mono">{{ s.parent_phone }}</td>
                         <td class="p-3 text-xs">
                             {% for res in s.results %}[{{res.lesson_title}}: {{res.score}}/{{res.total}}] {% endfor %}
@@ -75,9 +80,9 @@
 
         <div class="grid md:grid-cols-2 gap-8">
             <section class="bg-white p-6 rounded-3xl shadow-lg border-t-8 border-red-500">
-                <h2 class="text-xl font-bold mb-4">إدارة الكورسات الحالية</h2>
+                <h2 class="text-xl font-bold mb-4">حذف كورسات</h2>
                 {% for c in courses %}
-                <div class="flex justify-between items-center p-3 border-b">
+                <div class="flex justify-between items-center p-2 border-b text-sm">
                     <span>{{ c.title }}</span>
                     <a href="/delete_course/{{c.id}}" class="text-red-600 font-bold">حذف 🗑️</a>
                 </div>
@@ -85,13 +90,13 @@
             </section>
 
             <section class="bg-white p-6 rounded-3xl shadow-lg border-t-8 border-yellow-500">
-                <h2 class="text-xl font-bold mb-4">توليد أكواد الاشتراك</h2>
-                <form action="/generate_codes" method="POST" class="flex gap-2 mb-4">
-                    <input type="number" name="count" placeholder="العدد" class="w-24 p-3 border rounded-xl">
-                    <button class="flex-1 bg-yellow-500 text-white font-bold rounded-xl">إنشاء الأكواد</button>
+                <h2 class="text-xl font-bold mb-4">أكواد الاشتراك</h2>
+                <form action="/generate_codes" method="POST" class="flex gap-2 mb-2">
+                    <input type="number" name="count" placeholder="العدد" class="w-20 p-2 border rounded-xl">
+                    <button class="flex-1 bg-yellow-500 text-white font-bold rounded-xl">توليد</button>
                 </form>
-                <div class="bg-gray-900 p-4 rounded-xl text-yellow-400 font-mono text-center max-h-32 overflow-y-auto">
-                    {% for c in codes %} <div>{{ c.code }}</div> {% endfor %}
+                <div class="bg-gray-900 p-3 rounded-xl text-yellow-400 font-mono text-center h-24 overflow-y-auto">
+                    {% for c in codes %} <span>{{ c.code }} </span> {% endfor %}
                 </div>
             </section>
         </div>
