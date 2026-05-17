@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head><title>الامتحان</title></head>
+<body>
+    <h1>امتحان: {{ lesson.title }}</h1>
+    <form method="post">
+        {% for q in lesson.questions %}
+        <p>{{ q.text }}</p>
+        <input type="radio" name="{{ q.id }}" value="A"> {{ q.option_a }} <br>
+        <input type="radio" name="{{ q.id }}" value="B"> {{ q.option_b }} <br>
+        {% endfor %}
+        <hr>
+        <button type="submit">إرسال الحل</button>
+    </form>
+</body>
+</html>

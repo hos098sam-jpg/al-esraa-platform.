@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>الامتحان الإلكتروني</title>
+</head>
+<body class="bg-slate-100 p-4 md:p-10">
+    <div class="max-w-3xl mx-auto bg-white p-8 rounded-3xl shadow-lg">
+        <div class="flex justify-between items-center mb-8 border-b pb-4">
+            <h1 class="text-2xl font-bold text-blue-800">امتحان: {{ exam.title }}</h1>
+            <span id="timer" class="bg-red-100 text-red-600 px-4 py-2 rounded-full font-bold">30:00</span>
+        </div>
+
+        <form action="/submit_exam/{{ exam.id }}" method="POST" class="space-y-10">
+            {% for q in questions %}
+            <div class="space-y-4">
+                <p class="font-bold text-lg text-slate-800">{{ loop.index }}. اختر الإجابة الصحيحة من الصورة:</p>
+                {% if q.image_url %}
+                <img src="{{ q.image_url }}" class="rounded-xl border w-full h-auto shadow-sm">
+                {% endif %}
+                <div class="grid grid-cols-2 gap-4">
+                    {% for opt in ['أ', 'ب', 'ج', 'د'] %}
+                    <label class="flex items-center p-4 border rounded-xl cursor-pointer hover:bg-blue-50 transition">
+                        <input type="radio" name="q_{{ q.id }}" value="{{ opt }}" class="ml-3">
+                        <span>{{ opt }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+            <button type="submit" class="w-full bg-green-600 text-white py-4 rounded-2xl font-bold text-xl shadow-lg">إرسال الحل النهائي</button>
+        </form>
+    </div>
+</body>
+</html>

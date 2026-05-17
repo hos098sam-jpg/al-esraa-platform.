@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تسجيل الدخول | منصة الإسراء</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
+        body { font-family: 'Cairo', sans-serif; }
+    </style>
+</head>
+<body class="bg-blue-900 flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md text-center">
+        <div class="mb-6">
+            <div class="bg-yellow-400 w-20 h-20 rounded-full flex items-center justify-center mx-auto shadow-lg text-4xl">🔑</div>
+            <h2 class="text-3xl font-black text-blue-900 mt-4">تسجيل الدخول</h2>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="bg-red-100 text-red-700 p-3 rounded-lg mb-4 text-sm font-bold">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form action="/login" method="POST" class="space-y-4">
+            <input type="text" name="phone" placeholder="رقم موبايل الطالب" required
+                   class="w-full p-4 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-blue-500 transition">
+
+            <input type="text" name="parent_phone" placeholder="رقم موبايل ولي الأمر" required
+                   class="w-full p-4 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-blue-500 transition">
+
+            <input type="password" name="password" placeholder="كلمة السر" required
+                   class="w-full p-4 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-blue-500 transition">
+
+            <button type="submit" class="w-full bg-blue-900 text-white py-4 rounded-xl font-bold text-xl hover:bg-blue-800 transition shadow-lg">
+                دخول للمنصة
+            </button>
+        </form>
+
+        <div class="mt-6 flex justify-between text-sm font-bold">
+            <a href="/register" class="text-blue-700 hover:underline">إنشاء حساب جديد</a>
+            <a href="/" class="text-gray-500 hover:underline">العودة للرئيسية</a>
+        </div>
+    </div>
+</body>
+</html>
